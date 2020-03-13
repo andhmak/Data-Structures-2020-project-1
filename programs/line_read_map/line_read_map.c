@@ -32,5 +32,6 @@ int main(void) {
             map_insert(map, create_string(linebuf), create_int(*times + 1));
         }
     }
+    map_destroy(map);
     return 0;
 }
