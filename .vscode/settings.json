@@ -1,10 +1,10 @@
 {
 	"c_project": {
 		// Directory στο οποίο βρίσκεται το πρόγραμμα
-		"dir": "programs/gif_example",
+		"dir": "programs/line_read",
 
 		// Όνομα του εκτελέσιμου προγράμματος
-		"program": "gif_example",
+		"program": "line_read",
 
 		// Ορίσματα του προγράμματος.
 		// - Για ανακατεύθυνση εισόδου βάζουμε ορίσματα: "<", "input-file"
