@@ -23,6 +23,7 @@ void pq_sort_vector(Vector vec, CompareFunc compare) {
 		vector_set_at(vec, i, pqueue_max(pqueue));
 		pqueue_remove_max(pqueue);
 	}
+	pqueue_destroy(pqueue);
 	// επαναφορά της destroy
 	vector_set_destroy_value(vec, old_destroy);
 }
