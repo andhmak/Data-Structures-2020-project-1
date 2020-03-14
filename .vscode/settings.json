@@ -1,10 +1,10 @@
 {
 	"c_project": {
 		// Directory στο οποίο βρίσκεται το πρόγραμμα
-		"dir": "programs/line_read",
+		"dir": "programs/exer_3",
 
 		// Όνομα του εκτελέσιμου προγράμματος
-		"program": "line_read",
+		"program": "exer_3",
 
 		// Ορίσματα του προγράμματος.
 		// - Για ανακατεύθυνση εισόδου βάζουμε ορίσματα: "<", "input-file"
