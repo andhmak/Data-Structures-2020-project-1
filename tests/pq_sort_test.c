@@ -44,8 +44,19 @@ void test_pq_sort_vector(void) {
 }
 
 void test_pq_sort_list(void) {
+	List list = list_create(free);
+	int N = 10;
+	for (int i = 0; i < N; i++)
+		list_insert_next(list, LIST_BOF, create_int(rand()));
+	pq_sort_list(list, compare_ints);
+	int last = INT_MIN;
+	for (ListNode node = list_first(list) ; node != LIST_EOF ; node = list_next(list, node)) {
+		int* current = list_node_value(list, node);
+		TEST_CHECK(last <= *current);			// Το στοιχείο πρέπει να είναι >= από το προηγούμενο
+		last = *current;
+	}
 
-	// προς υλοποίηση...
+	list_destroy(list);
 
 }
 

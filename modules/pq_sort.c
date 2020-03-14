@@ -29,7 +29,18 @@ void pq_sort_vector(Vector vec, CompareFunc compare) {
 }
 
 void pq_sort_list(List list, CompareFunc compare) {
+	DestroyFunc old_destroy = list_set_destroy_value(list, NULL);
 
-	// ...
+	PriorityQueue pqueue = pqueue_create(compare, NULL, NULL);
+	for (ListNode node = list_first(list) ; node != LIST_EOF ; node = list_next(list, node)) {
+		pqueue_insert(pqueue, list_node_value(list, node));
+	}
+	list_destroy(list);
+	list = list_create(old_destroy);
+	while (pqueue_size(pqueue) > 0) {
+		list_insert_next(list, LIST_BOF, pqueue_max(pqueue));
+		pqueue_remove_max(pqueue);
+	}
+	pqueue_destroy(pqueue);
 
 }
