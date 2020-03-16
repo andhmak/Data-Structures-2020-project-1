@@ -18,10 +18,9 @@ int* create_int(int a) {
 }
 
 int main(void) {
-    Map map = map_create(strcmp, free, free);
+    Map map = map_create((CompareFunc) strcmp, free, free);
     char linebuf[LINELENGTH];
     int* times;
-    MapNode node;
     while (fgets(linebuf, LINELENGTH, stdin) != NULL) {
         if ((times = (int*)map_find(map, linebuf)) == NULL) {
             printf("0\n");

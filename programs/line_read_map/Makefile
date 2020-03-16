@@ -6,7 +6,7 @@ INCLUDE = ../../include
 CC = gcc
 
 # Compile options. Το -I<dir> λέει στον compiler να αναζητήσει εκεί include files
-CFLAGS = -Wall -g -I$(INCLUDE)
+CFLAGS = -Wall -g -I$(INCLUDE) -Werror
 LDFLAGS = 
 
 # Αρχεία .o
