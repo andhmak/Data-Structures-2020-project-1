@@ -3,22 +3,24 @@
 #include <stdlib.h>
 #include "ADTSet.h"
 
+//could hold "top left" cell in state struct, or most left, and the amount of them
+
 typedef struct {
 	int x, y;
 } LifeCell;
 
 int compare_cells(LifeCell a, LifeCell b) {
-	if (a.x < b.x) {
+	if (a.y < b.y) {
 		return -1;
 	}
-	else if (a.x > b.x) {
+	else if (a.y > b.y) {
 		return 1;
 	}
 	else {
-		if (a.y > b.y) {
+		if (a.x > b.x) {
 			return -1;
 		}
-		else if (a.y == b.y) {
+		else if (a.x == b.x) {
 			return 0;
 		}
 		else {
@@ -91,7 +93,21 @@ struct life_state* life_create_from_rle(char* file) {
 // Αποθηκεύει την κατάσταση state στο αρχείο file (RLE format)
 void life_save_to_rle(struct life_state* state, char* file) {
 	FILE *stream = fopen(file, "wb");
-
+	int leftmost = __INT_MAX__;
+	SetNode node, prevnode;
+	for (node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
+		if (set_node_value(state->set, node)->x < leftmost) {
+			leftmost = set_node_value(state->set, node)->x;
+		}
+	}
+	if (set_size(state->set)) {
+		node = set_first(state->set);
+		printf("%d", set_node_value(state->set, node)->x - leftmost + 1);
+		printf("b");
+	}
+	for (prevnode = node, node = set_next(state->set, node) ; node != SET_EOF ; prevnode = node, node = set_next(state->set, node)) {
+		
+	}
 }
 
 // Επιστρέφει την τιμή του κελιού cell στην κατάσταση state (true: ζωντανό, false: νεκρό)
