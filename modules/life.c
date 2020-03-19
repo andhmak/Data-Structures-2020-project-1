@@ -93,7 +93,7 @@ struct life_state* life_create_from_rle(char* file) {
 // Αποθηκεύει την κατάσταση state στο αρχείο file (RLE format)
 void life_save_to_rle(struct life_state* state, char* file) {
 	FILE *stream = fopen(file, "wb");
-	int leftmost = __INT_MAX__;
+	int leftmost = __INT_MAX__, num = 0;
 	SetNode node, prevnode;
 	for (node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
 		if (set_node_value(state->set, node)->x < leftmost) {
@@ -102,30 +102,58 @@ void life_save_to_rle(struct life_state* state, char* file) {
 	}
 	if (set_size(state->set)) {
 		node = set_first(state->set);
-		printf("%d", set_node_value(state->set, node)->x - leftmost + 1);
-		printf("b");
+		fprintf(stream, "%db", set_node_value(state->set, node)->x - leftmost);
+		num++;
 	}
 	for (prevnode = node, node = set_next(state->set, node) ; node != SET_EOF ; prevnode = node, node = set_next(state->set, node)) {
-		
+		if (set_node_value(state->set, node)->y - set_node_value(state->set, prevnode)->y) {
+			for (int i = 0 ; i < set_node_value(state->set, node)->y - set_node_value(state->set, prevnode)->y ; i++) {
+				fprintf(stream, "$");
+			}
+			fprintf(stream, "%db", set_node_value(state->set, node)->x - leftmost);
+			num++;
+		}
+		else if (set_node_value(state->set, node)->x - set_node_value(state->set, prevnode)->x == 1) {
+			num++;
+		}
+		else {
+			if (num != 1) {
+				fprintf(stream, "%do", num);
+			}
+			else {
+				fprintf(stream, "o");
+			}
+			num = 1;
+			fprintf(stream, "%db", set_node_value(state->set, node)->x - set_node_value(state->set, prevnode)->x - 1);
+		}
 	}
+	printf("!");
+	fclose(stream);
 }
 
 // Επιστρέφει την τιμή του κελιού cell στην κατάσταση state (true: ζωντανό, false: νεκρό)
 bool life_get_cell(struct life_state* state, LifeCell cell) {
-
+	return set_find(state->set, &cell);
 }
 
 // Αλλάζει την τιμή του κελιού cell στην κατάσταση state
 void life_set_cell(struct life_state* state, LifeCell cell, bool value) {
-
+	if (value) {
+		set_insert(state->set, &cell);
+	}
+	else {
+		set_remove(state->set, &cell);
+	}
 }
 
 // Παράγει μια νέα κατάσταση που προκύπτει από την εξέλιξη της κατάστασης state
 struct life_state* life_evolve(struct life_state* state) {
-
+	struct life_state *newstate;
+	
 }
 
 // Καταστρέφει την κατάσταση ελευθερώντας οποιαδήποτε μνήμη έχει δεσμευτεί
 void life_destroy(struct life_state* state) {
-
+	set_destroy(state->set);
+	free(state);
 }
