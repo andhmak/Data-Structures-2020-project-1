@@ -29,6 +29,11 @@ int compare_cells(LifeCell a, LifeCell b) {
 	}
 }
 
+LifeCell *create_cell(LifeCell) {
+	LifeCell *cell = malloc(sizeof(LifeCell));
+	return cell;
+}
+
 //typdef struct life_state* LifeState;
 
 struct life_state {
@@ -139,7 +144,7 @@ bool life_get_cell(struct life_state* state, LifeCell cell) {
 // Αλλάζει την τιμή του κελιού cell στην κατάσταση state
 void life_set_cell(struct life_state* state, LifeCell cell, bool value) {
 	if (value) {
-		set_insert(state->set, &cell);
+		set_insert(state->set, create_cell(cell));
 	}
 	else {
 		set_remove(state->set, &cell);
@@ -149,7 +154,16 @@ void life_set_cell(struct life_state* state, LifeCell cell, bool value) {
 // Παράγει μια νέα κατάσταση που προκύπτει από την εξέλιξη της κατάστασης state
 struct life_state* life_evolve(struct life_state* state) {
 	struct life_state *newstate;
-	
+	LifeCell cell;
+	int num;
+	for (SetNode node = set_next(state->set, node) ; node != SET_EOF ; node = set_next(state->set, node)) {
+		cell = *(LifeCell *)set_node_value(state->set, node);
+		for (int i = -1 ; i <= 1 ; i++) {
+			for (int j = -1 ; j <= 1 ; j++) {
+
+			}
+		}
+	}
 }
 
 // Καταστρέφει την κατάσταση ελευθερώντας οποιαδήποτε μνήμη έχει δεσμευτεί
