@@ -153,17 +153,32 @@ void life_set_cell(struct life_state* state, LifeCell cell, bool value) {
 
 // Παράγει μια νέα κατάσταση που προκύπτει από την εξέλιξη της κατάστασης state
 struct life_state* life_evolve(struct life_state* state) {
-	struct life_state *newstate;
-	LifeCell cell;
-	int num;
+	struct life_state *newstate = life_create();
+	LifeCell cell, tmpcell;
+	int num, i, j;
 	for (SetNode node = set_next(state->set, node) ; node != SET_EOF ; node = set_next(state->set, node)) {
-		cell = *(LifeCell *)set_node_value(state->set, node);
-		for (int i = -1 ; i <= 1 ; i++) {
-			for (int j = -1 ; j <= 1 ; j++) {
-
+		for (i = -1 ; i <= 1 ; i++) {
+			for (j = -1 ; j <= 1 ; j++) {
+				cell = *(LifeCell *)set_node_value(state->set, node);
+				cell.x += i;
+				cell.y += j;
+				for (i = -1 ; i <= 1 ; i++) {
+					for (j = -1 ; j <= 1 ; j++) {
+						tmpcell = cell;
+						tmpcell.x += i;
+						tmpcell.y += j;
+						if (life_get_cell(state, tmpcell)) {
+							num++;
+						}
+					}
+				}
+				if ((num == 4) || ((num == 3) && life_get_cell(state, cell))) {
+					life_set_cell(newstate, cell, true);
+				}
 			}
 		}
 	}
+	return newstate;
 }
 
 // Καταστρέφει την κατάσταση ελευθερώντας οποιαδήποτε μνήμη έχει δεσμευτεί
