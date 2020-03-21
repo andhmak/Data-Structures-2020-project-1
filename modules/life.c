@@ -164,6 +164,9 @@ struct life_state* life_evolve(struct life_state* state) {
 				cell.y += j;
 				for (i = -1 ; i <= 1 ; i++) {
 					for (j = -1 ; j <= 1 ; j++) {
+						if ((i == 0) && (j == 0)) {
+							continue;
+						}
 						tmpcell = cell;
 						tmpcell.x += i;
 						tmpcell.y += j;
@@ -172,7 +175,7 @@ struct life_state* life_evolve(struct life_state* state) {
 						}
 					}
 				}
-				if ((num == 4) || ((num == 3) && life_get_cell(state, cell))) {
+				if ((num == 3) || ((num == 2) && life_get_cell(state, cell))) {
 					life_set_cell(newstate, cell, true);
 				}
 			}
