@@ -11,10 +11,10 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = pq_sort_test.o $(MODULES)/pq_sort.o $(LIB)/k08.a
+OBJS = life_test.o $(MODULES)/life.o $(LIB)/k08.a
 
 # Το εκτελέσιμο πρόγραμμα
-EXEC = pq_sort_test
+EXEC = life_test
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =

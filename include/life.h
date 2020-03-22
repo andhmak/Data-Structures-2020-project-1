@@ -1,6 +1,10 @@
+#include <stdbool.h>
+
 typedef struct {
 	int x, y;
 } LifeCell;
+
+typedef struct life_state* LifeState;
 
 // Δημιουργεί μια κατάσταση του παιχνιδιού όπου όλα τα κελιά είναι νεκρά.
 LifeState life_create();

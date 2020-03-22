@@ -9,18 +9,18 @@ typedef struct {
 	int x, y;
 } LifeCell;
 
-int compare_cells(LifeCell a, LifeCell b) {
-	if (a.y < b.y) {
+int compare_cells(LifeCell *a, LifeCell *b) {
+	if (a->y > b->y) {
 		return -1;
 	}
-	else if (a.y > b.y) {
+	else if (a->y < b->y) {
 		return 1;
 	}
 	else {
-		if (a.x > b.x) {
+		if (a->x < b->x) {
 			return -1;
 		}
-		else if (a.x == b.x) {
+		else if (a->x == b->x) {
 			return 0;
 		}
 		else {
@@ -35,18 +35,20 @@ LifeCell *create_cell(LifeCell cell) {
 	return pcell;
 }
 
-typedef life_state* LifeState;
+typedef struct life_state* LifeState;
 
-typedef struct {
+struct life_state {
 	Set set;
-} life_state;
+};
 
 // Δημιουργεί μια κατάσταση του παιχνιδιού όπου όλα τα κελιά είναι νεκρά.
 LifeState life_create() {
-	LifeState state = malloc(sizeof(life_state));
-	state->set = set_create(compare_cells, free);
+	LifeState state = malloc(sizeof(struct life_state));
+	state->set = set_create((CompareFunc)compare_cells, free);
 	return state;
 }
+
+void life_set_cell(LifeState state, LifeCell cell, bool value);
 
 // Δημιουργεί μία κατάσταση του παιχνιδιού με βάση τα δεδομένα του αρχείο file (RLE format)
 LifeState life_create_from_rle(char* file) {
@@ -108,16 +110,35 @@ void life_save_to_rle(LifeState state, char* file) {
 	}
 	if (set_size(state->set)) {
 		node = set_first(state->set);
-		fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - leftmost);
+		if (((LifeCell*)set_node_value(state->set, node))->x - leftmost == 1) {
+			fprintf(stream, "b");
+		}
+		else if (((LifeCell*)set_node_value(state->set, node))->x - leftmost) {
+			fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - leftmost);
+		}
 		num++;
 	}
 	for (prevnode = node, node = set_next(state->set, node) ; node != SET_EOF ; prevnode = node, node = set_next(state->set, node)) {
 		if (((LifeCell*)set_node_value(state->set, node))->y - ((LifeCell*)set_node_value(state->set, prevnode))->y) {
-			for (int i = 0 ; i < ((LifeCell*)set_node_value(state->set, node))->y - ((LifeCell*)set_node_value(state->set, prevnode))->y ; i++) {
+			if (num != 1) {
+				fprintf(stream, "%do", num);
+			}
+			else {
+				fprintf(stream, "o");
+			}
+			if (((LifeCell*)set_node_value(state->set, prevnode))->y - ((LifeCell*)set_node_value(state->set, node))->y != 1) {
+				fprintf(stream, "%d$", ((LifeCell*)set_node_value(state->set, prevnode))->y - ((LifeCell*)set_node_value(state->set, node))->y);
+			}
+			else {
 				fprintf(stream, "$");
 			}
-			fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - leftmost);
-			num++;
+			if (((LifeCell*)set_node_value(state->set, node))->x - leftmost == 1) {
+				fprintf(stream, "b");
+			}
+			else if (((LifeCell*)set_node_value(state->set, node))->x - leftmost) {
+				fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - leftmost);
+			}
+			num = 1;
 		}
 		else if (((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x == 1) {
 			num++;
@@ -130,10 +151,21 @@ void life_save_to_rle(LifeState state, char* file) {
 				fprintf(stream, "o");
 			}
 			num = 1;
-			fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x - 1);
+			if (((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x - 1 != 1) {
+				fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x - 1);
+			}
+			else {
+				fprintf(stream, "b");
+			}
 		}
 	}
-	printf("!");
+	if (num != 1) {
+		fprintf(stream, "%do", num);
+	}
+	else {
+		fprintf(stream, "o");
+	}
+	fprintf(stream, "!");
 	fclose(stream);
 }
 
@@ -154,10 +186,10 @@ void life_set_cell(LifeState state, LifeCell cell, bool value) {
 
 // Παράγει μια νέα κατάσταση που προκύπτει από την εξέλιξη της κατάστασης state
 LifeState life_evolve(LifeState state) {
-	life_state *newstate = life_create();
+	LifeState newstate = life_create();
 	LifeCell cell, tmpcell;
 	int num, i, j;
-	for (SetNode node = set_next(state->set, node) ; node != SET_EOF ; node = set_next(state->set, node)) {
+	for (SetNode node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
 		for (i = -1 ; i <= 1 ; i++) {
 			for (j = -1 ; j <= 1 ; j++) {
 				cell = *(LifeCell *)set_node_value(state->set, node);
