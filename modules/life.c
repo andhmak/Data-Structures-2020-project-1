@@ -118,6 +118,10 @@ void life_save_to_rle(LifeState state, char* file) {
 		}
 		num++;
 	}
+	else {
+		fprintf(stream, "!");
+		return;
+	}
 	for (prevnode = node, node = set_next(state->set, node) ; node != SET_EOF ; prevnode = node, node = set_next(state->set, node)) {
 		if (((LifeCell*)set_node_value(state->set, node))->y - ((LifeCell*)set_node_value(state->set, prevnode))->y) {
 			if (num != 1) {
@@ -188,21 +192,22 @@ void life_set_cell(LifeState state, LifeCell cell, bool value) {
 LifeState life_evolve(LifeState state) {
 	LifeState newstate = life_create();
 	LifeCell cell, tmpcell;
-	int num, i, j;
+	int num, i, j, k, l;
 	for (SetNode node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
 		for (i = -1 ; i <= 1 ; i++) {
 			for (j = -1 ; j <= 1 ; j++) {
 				cell = *(LifeCell *)set_node_value(state->set, node);
 				cell.x += i;
 				cell.y += j;
-				for (i = -1 ; i <= 1 ; i++) {
-					for (j = -1 ; j <= 1 ; j++) {
-						if ((i == 0) && (j == 0)) {
+				num = 0;
+				for (k = -1 ; k <= 1 ; k++) {
+					for (l = -1 ; l <= 1 ; l++) {
+						if ((k == 0) && (l == 0)) {
 							continue;
 						}
 						tmpcell = cell;
-						tmpcell.x += i;
-						tmpcell.y += j;
+						tmpcell.x += k;
+						tmpcell.y += l;
 						if (life_get_cell(state, tmpcell)) {
 							num++;
 						}

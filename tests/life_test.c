@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
 #include "life.h"
 
@@ -20,6 +21,7 @@ void test_create(void) {
         cell.y = rand();
         TEST_CHECK(life_get_cell(state, cell) == false);
     }
+    life_destroy(state);
 }
 
 void test_get_set_cell(void) {
@@ -34,6 +36,7 @@ void test_get_set_cell(void) {
         life_set_cell(state, cell, false);
         TEST_CHECK(life_get_cell(state, cell) == false);
     }
+    life_destroy(state);
 }
 
 void test_create_from_rle(void) {
@@ -66,31 +69,65 @@ void test_create_from_rle(void) {
     cell.x = 2;
     cell.y = -2;
     TEST_CHECK(life_get_cell(state, cell) == true);
+    life_destroy(state);
 }
 
 void test_save_to_rle(void) {
     LifeState state = life_create_from_rle("glider.rle");
     life_save_to_rle(state, "glidertest.rle");
+    FILE *test = fopen("glidertest.rle", "rb");
+    char string[100];
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
+    fclose(test);
+    remove("glidertest.rle");
+    life_destroy(state);
     state = life_create_from_rle("gun.rle");
     life_save_to_rle(state, "guntest.rle");
+    test = fopen("guntest.rle", "rb");
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "24bo$22bobo$12b2o6b2o12b2o$11bo3bo4b2o12b2o$2o8bo5bo3b2o$2o8bo3bob2o4bobo$10bo5bo7bo$11bo3bo$12b2o!") == 0);
+    fclose(test);
+    remove("guntest.rle");
+    life_destroy(state);
 }
 
 void test_evolve(void) {
-    
-}
-
-void test_destroy(void) {
-    
+    LifeState state = life_create_from_rle("glider.rle");
+    state = life_evolve(state);
+    life_save_to_rle(state, "gliderevolved.rle");
+    FILE *test = fopen("gliderevolved.rle", "rb");
+    char string[20];
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "obo$b2o$bo!") == 0);
+//    fclose(test);
+//    state = life_evolve(state);
+//    life_save_to_rle(state, "gliderevolved.rle");
+//    test = fopen("gliderevolved.rle", "rb");
+//    fscanf(test, "%s", string);
+//    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
+//    fclose(test);
+//    state = life_evolve(state);
+//    life_save_to_rle(state, "gliderevolved.rle");
+//    test = fopen("gliderevolved.rle", "rb");
+//    fscanf(test, "%s", string);
+//    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
+//    fclose(test);
+//    state = life_evolve(state);
+//    life_save_to_rle(state, "gliderevolved.rle");
+//    test = fopen("gliderevolved.rle", "rb");
+//    fscanf(test, "%s", string);
+//    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
+//    fclose(test);
 }
 
 // Λίστα με όλα τα tests προς εκτέλεση
 TEST_LIST = {
 	{ "life_create", test_create },
+    { "life_get_set_cell", test_get_set_cell },
 	{ "life_create_from_rle", test_create_from_rle },
     { "life_save_to_rle", test_save_to_rle },
-    { "life_get_set_cell", test_get_set_cell },
     { "life_evolve", test_evolve },
-    { "life_destroy", test_destroy },
 
 	{ NULL, NULL } // τερματίζουμε τη λίστα με NULL
 };
