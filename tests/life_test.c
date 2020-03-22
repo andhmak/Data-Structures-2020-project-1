@@ -92,33 +92,43 @@ void test_save_to_rle(void) {
     life_destroy(state);
 }
 
-void test_evolve(void) {
-    LifeState state = life_create_from_rle("glider.rle");
+void test_evolve(void) {  /* Testing a  full glider cycle */
+    LifeState state = life_create_from_rle("glider.rle"), prevstate;
+    prevstate = state;
     state = life_evolve(state);
+    life_destroy(prevstate);
     life_save_to_rle(state, "gliderevolved.rle");
     FILE *test = fopen("gliderevolved.rle", "rb");
     char string[20];
     fscanf(test, "%s", string);
     TEST_CHECK(strcmp(string, "obo$b2o$bo!") == 0);
-//    fclose(test);
-//    state = life_evolve(state);
-//    life_save_to_rle(state, "gliderevolved.rle");
-//    test = fopen("gliderevolved.rle", "rb");
-//    fscanf(test, "%s", string);
-//    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
-//    fclose(test);
-//    state = life_evolve(state);
-//    life_save_to_rle(state, "gliderevolved.rle");
-//    test = fopen("gliderevolved.rle", "rb");
-//    fscanf(test, "%s", string);
-//    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
-//    fclose(test);
-//    state = life_evolve(state);
-//    life_save_to_rle(state, "gliderevolved.rle");
-//    test = fopen("gliderevolved.rle", "rb");
-//    fscanf(test, "%s", string);
-//    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
-//    fclose(test);
+    fclose(test);
+    prevstate = state;
+    state = life_evolve(state);
+    life_destroy(prevstate);
+    life_save_to_rle(state, "gliderevolved.rle");
+    test = fopen("gliderevolved.rle", "rb");
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "2bo$obo$b2o!") == 0);
+    fclose(test);
+    prevstate = state;
+    state = life_evolve(state);
+    life_destroy(prevstate);
+    life_save_to_rle(state, "gliderevolved.rle");
+    test = fopen("gliderevolved.rle", "rb");
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "o$b2o$2o!") == 0);
+    fclose(test);
+    prevstate = state;
+    state = life_evolve(state);
+    life_destroy(prevstate);
+    life_save_to_rle(state, "gliderevolved.rle");
+    test = fopen("gliderevolved.rle", "rb");
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
+    fclose(test);
+    remove("gliderevolved.rle");
+    life_destroy(state);
 }
 
 // Λίστα με όλα τα tests προς εκτέλεση
