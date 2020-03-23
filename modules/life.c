@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "ADTSet.h"
+#include "ADTMap.h"
+#include "ADTList.h"
 
 //could hold "top left" cell in state struct, or most left, and the amount of them
 
@@ -40,6 +42,24 @@ typedef struct life_state* LifeState;
 struct life_state {
 	Set set;
 };
+
+int compare_states(LifeState a, LifeState b) {
+	if (set_size(a->set) < set_size(b->set)) {
+		return -1;
+	}
+	else if (set_size(a->set) > set_size(b->set)) {
+		return 1;
+	}
+	else {
+		int i;
+		for (SetNode node1 = set_first(a->set), node2 = set_first(b->set) ; node1 != SET_EOF ; node1 = set_next(a->set, node1), node2 = set_next(b->set, node1)) {
+			if ((i = compare_cells(set_node_value(a->set, node1), set_node_value(b->set, node2))) != 0) {
+				return i;
+			}
+		}
+		return 0;
+	}
+}
 
 // Δημιουργεί μια κατάσταση του παιχνιδιού όπου όλα τα κελιά είναι νεκρά.
 LifeState life_create() {
@@ -226,4 +246,41 @@ LifeState life_evolve(LifeState state) {
 void life_destroy(LifeState state) {
 	set_destroy(state->set);
 	free(state);
+}
+
+typedef struct {
+	ListNode node;
+	LifeState state;
+} statenode;
+
+int compare_statenodes(statenode *a, statenode *b) {
+	return compare_states(a->state, b->state);
+}
+
+statenode *create_statenode(statenode a) {
+	statenode* p = malloc(sizeof(statenode));
+	*p = a;
+	return p;
+}
+
+// Επιστρέφει μία λίστα από το πολύ steps εξελίξεις, ξεκινώνας από την κατάσταση
+// state. Αν βρεθεί επανάληψη τότε στο *loop αποθηκεύεται ο κόμβος στον οποίο
+// συνεχίζει η εξέλιξη μετά τον τελευταίο κόμβο της λίστας, διαφορετικά NULL
+List life_evolve_many(LifeState state, int steps, ListNode* loop) {
+	Map map = map_create((CompareFunc)compare_states, NULL, NULL);
+	List list = list_create(free);
+	list_insert_next(list, LIST_BOF, state);
+	map_insert(map, state, list_last(list));
+	for (int i = 0 ; i < steps - 1 ; i++) {
+		state = life_evolve(state);
+		if ((*loop = (ListNode)map_find(map, state))) {
+			break;
+		}
+		else {
+			list_insert_next(list, list_last(list), state);
+			map_insert(map, state, list_last(list));
+		}
+	}
+	map_destroy(map);
+	return list;
 }
