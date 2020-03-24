@@ -273,9 +273,8 @@ List life_evolve_many(LifeState state, int steps, ListNode* loop) {
 	map_insert(map, state, list_last(list));
 	for (int i = 0 ; i < steps - 1 ; i++) {
 		state = life_evolve(state);
-		map_find(map, state);
-		while(0);
-		if ((*loop = (ListNode)map_find(map, state))) {
+		if ((*loop = (ListNode)map_find(map, state))) {  //<--This always segfaults when it's supposed to find it and it's driving me mad
+			life_destroy(state);
 			break;
 		}
 		else {
