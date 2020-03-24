@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <ADTList.h>
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
 #include "life.h"
 
@@ -129,6 +130,24 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
     fclose(test);
     remove("gliderevolved.rle");
     life_destroy(state);
+    ListNode loop = NULL;
+    List list = NULL;
+    while (loop);
+    state = life_create_from_rle("glider.rle");
+    list = life_evolve_many(state, 5, &loop);
+    LifeCell cell;
+    for (ListNode node = list_first(list); node != LIST_EOF ; node = list_next(list, node)) {
+        state = list_node_value(list, node);
+        printf("\n");
+        for (int y = 0 ; y >= -5 ; y--) {
+            for (int x = 0 ; x <= 5 ; x++) {
+                cell.x = x;
+                cell.y = y;
+                printf("%d ", life_get_cell(state, cell));
+            }
+            printf("\n");
+        }
+    }
 }
 
 // Λίστα με όλα τα tests προς εκτέλεση
