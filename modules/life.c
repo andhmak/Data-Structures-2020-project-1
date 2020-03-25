@@ -52,7 +52,7 @@ int compare_states(LifeState a, LifeState b) {
 	}
 	else {
 		int i;
-		for (SetNode node1 = set_first(a->set), node2 = set_first(b->set) ; node1 != SET_EOF ; node1 = set_next(a->set, node1), node2 = set_next(b->set, node1)) {
+		for (SetNode node1 = set_first(a->set), node2 = set_first(b->set) ; node1 != SET_EOF ; node1 = set_next(a->set, node1), node2 = set_next(b->set, node2)) {
 			if ((i = compare_cells(set_node_value(a->set, node1), set_node_value(b->set, node2))) != 0) {
 				return i;
 			}
@@ -273,7 +273,7 @@ List life_evolve_many(LifeState state, int steps, ListNode* loop) {
 	map_insert(map, state, list_last(list));
 	for (int i = 0 ; i < steps - 1 ; i++) {
 		state = life_evolve(state);
-		if ((*loop = (ListNode)map_find(map, state))) {  //<--This always segfaults when it's supposed to find it and it's driving me mad
+		if ((*loop = (ListNode)map_find(map, state))) {
 			life_destroy(state);
 			break;
 		}

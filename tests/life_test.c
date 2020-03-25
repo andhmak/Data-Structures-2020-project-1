@@ -132,11 +132,10 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
     life_destroy(state);
     ListNode loop = NULL;
     List list = NULL;
-    while (loop);
     state = life_create_from_rle("glider.rle");
-    list = life_evolve_many(state, 5, &loop);
+    list = life_evolve_many(state, 8, &loop);
     LifeCell cell;
-    for (ListNode node = list_first(list); node != LIST_EOF ; node = list_next(list, node)) {
+    for (ListNode node = list_first(list);  ; ) {
         state = list_node_value(list, node);
         printf("\n");
         for (int y = 0 ; y >= -5 ; y--) {
@@ -146,6 +145,17 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
                 printf("%d ", life_get_cell(state, cell));
             }
             printf("\n");
+        }
+        if (list_next(list, node) == LIST_EOF) {
+            if (loop) {
+                node = loop;
+            }
+            else {
+                break;
+            }
+        }
+        else if (list_next(list, node) != LIST_EOF){
+            node = list_next(list, node);
         }
     }
 }
