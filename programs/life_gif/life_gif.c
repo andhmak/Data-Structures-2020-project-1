@@ -34,7 +34,10 @@ int main(int argc, char *argv[]) {
 
 	// Δημιουργία ενός GIF και ενός bitmap στη μνήμη
 	GIF* gif = gif_create(round(zoom*(right - left)), round(zoom*(top - bottom)));
-	Bitmap* bitmap = bm_create(round(zoom*(right - left)), round(zoom*(top - bottom)));
+	Bitmap* bitmap;
+	if (zoom >= 1) {
+		bitmap = bm_create(int_zoom*(right - left), int_zoom*(top - bottom));
+	}
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
 	gif->default_delay = delay;
@@ -49,16 +52,18 @@ int main(int argc, char *argv[]) {
 		bm_set_color(bitmap, bm_atoi("white"));
 		bm_clear(bitmap);
 		bm_set_color(bitmap, bm_atoi("black"));
-        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
-			cell = state_node_cell(state, node);
-			// Και μετά ζωγραφίζουμε ένα μάυρο τετράγωνο με αρχή το
-			// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
-			if (zoom >= 1) {
-				bm_fillrect(bitmap, cell.x - (int_zoom - 1)/2, cell.y - (int_zoom - 1)/2, cell.x + (int_zoom)/2, cell.y + (int_zoom)/2);
+		if (zoom >= 1) {
+	        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
+				cell = state_node_cell(state, node);
+				// Και μετά ζωγραφίζουμε ένα μάυρο τετράγωνο με αρχή το
+				// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
+				if ((cell.x > left) && (cell.x < right) && (cell.y > bottom) && (cell.y < top)) {
+					bm_fillrect(bitmap, cell.x - (int_zoom - 1)/2 - left, cell.y - (int_zoom - 1)/2 - bottom, cell.x + (int_zoom)/2 - left, cell.y + (int_zoom)/2 - bottom);
+				}
 			}
-			else () {
-				
-			}
+		}
+		else {
+
 		}
 		// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
 		gif_add_frame(gif, bitmap);
