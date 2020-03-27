@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <ADTList.h>
+#include "ADTList.h"
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
 #include "life.h"
 
@@ -130,11 +130,14 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
     fclose(test);
     remove("gliderevolved.rle");
     life_destroy(state);
+}
+
+void test_evolve_many(void) {
     ListNode loop = NULL;
     List list = NULL;
-    state = life_create_from_rle("glider.rle");
-    list = life_evolve_many(state, 8, &loop);
     LifeCell cell;
+    LifeState state = life_create_from_rle("glider.rle");
+    list = life_evolve_many(state, 7, &loop);
     for (ListNode node = list_first(list);  ; ) {
         state = list_node_value(list, node);
         printf("\n");
@@ -158,6 +161,16 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
             node = list_next(list, node);
         }
     }
+    list_destroy(list);
+}
+
+void test_iteration(void) {
+    LifeCell cell;
+    LifeState state = life_create_from_rle("glider.rle");
+    for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
+        cell = state_node_cell(state, node);
+        printf("\nx: %d, y: %d\n", cell.x, cell.y);
+    }
 }
 
 // Λίστα με όλα τα tests προς εκτέλεση
@@ -167,6 +180,8 @@ TEST_LIST = {
 	{ "life_create_from_rle", test_create_from_rle },
     { "life_save_to_rle", test_save_to_rle },
     { "life_evolve", test_evolve },
+    { "life_evolve_many", test_evolve_many },
+    { "life_iteration", test_iteration },
 
 	{ NULL, NULL } // τερματίζουμε τη λίστα με NULL
 };

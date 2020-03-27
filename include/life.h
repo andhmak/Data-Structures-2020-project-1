@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include "ADTSet.h"
 #include "ADTList.h"
 
 typedef struct {
@@ -32,3 +33,23 @@ void life_destroy(LifeState state);
 // state. Αν βρεθεί επανάληψη τότε στο *loop αποθηκεύεται ο κόμβος στον οποίο
 // συνεχίζει η εξέλιξη μετά τον τελευταίο κόμβο της λίστας, διαφορετικά NULL
 List life_evolve_many(LifeState state, int steps, ListNode* loop);
+
+typedef SetNode StateNode;
+
+#define STATE_BOF (StateNode)0
+#define STATE_EOF (StateNode)0
+
+// Επιστρέφουν το πρώτο και το τελευταίο cell του state, ή STATE_BOF / STATE_EOF αντίστοιχα αν το set είναι κενό
+
+StateNode state_first(LifeState state);
+StateNode state_last(LifeState state);
+
+// Επιστρέφουν τον επόμενο και τον προηγούμενο κομβο του node, ή SET_EOF / SET_BOF
+// αντίστοιχα αν ο node δεν έχει επόμενο / προηγούμενο.
+
+StateNode state_next(LifeState state, StateNode node);
+StateNode state_previous(LifeState state, StateNode node);
+
+// Επιστρέφει το περιεχόμενο του κόμβου node
+
+LifeCell state_node_cell(LifeState state, StateNode node);

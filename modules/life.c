@@ -268,7 +268,7 @@ statenode *create_statenode(statenode a) {
 // συνεχίζει η εξέλιξη μετά τον τελευταίο κόμβο της λίστας, διαφορετικά NULL
 List life_evolve_many(LifeState state, int steps, ListNode* loop) {
 	Map map = map_create((CompareFunc)compare_states, NULL, NULL);
-	List list = list_create(free);
+	List list = list_create((DestroyFunc)life_destroy);
 	list_insert_next(list, LIST_BOF, state);
 	map_insert(map, state, list_last(list));
 	for (int i = 0 ; i < steps - 1 ; i++) {
@@ -284,4 +284,45 @@ List life_evolve_many(LifeState state, int steps, ListNode* loop) {
 	}
 	map_destroy(map);
 	return list;
+}
+
+//struct set {
+//	SetNode root;				// η ρίζα, NULL αν είναι κενό δέντρο
+//	int size;					// μέγεθος, ώστε η set_size να είναι Ο(1)
+//	CompareFunc compare;		// η διάταξη
+//	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο του set
+//};
+
+//maybe if it doesn't allow that then pointer to SetNode
+
+typedef SetNode StateNode;
+
+#define STATE_BOF (StateNode)0
+#define STATE_EOF (StateNode)0
+
+// Επιστρέφουν το πρώτο και το τελευταίο cell του state, ή STATE_BOF / STATE_EOF αντίστοιχα αν το set είναι κενό
+
+StateNode state_first(LifeState state) {
+	return set_first(state->set);
+}
+
+StateNode state_last(LifeState state) {
+	return set_last(state->set);
+}
+
+// Επιστρέφουν τον επόμενο και τον προηγούμενο κομβο του node, ή SET_EOF / SET_BOF
+// αντίστοιχα αν ο node δεν έχει επόμενο / προηγούμενο.
+
+StateNode state_next(LifeState state, StateNode node) {
+	return set_next(state->set, node);
+}
+
+StateNode state_previous(LifeState state, StateNode node) {
+	return set_previous(state->set, node);
+}
+
+// Επιστρέφει το περιεχόμενο του κόμβου node
+
+LifeCell state_node_cell(LifeState state, StateNode node) {
+	return *(LifeCell*)set_node_value(state->set, node);
 }
