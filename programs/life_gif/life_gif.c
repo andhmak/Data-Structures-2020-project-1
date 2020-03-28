@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 		bitmap = bm_create(int_zoom*(right - left), int_zoom*(top - bottom));
 	}
 	else {
-
+		
 	}
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
