@@ -14,15 +14,15 @@ int main(int argc, char *argv[]) {
 	int int_zoom = round(zoom);
     char *gif_name = argv[10];
     if (frames < 1) {
-        fprintf(stderr, "Invalid frames value");
+        fprintf(stderr, "Invalid frames value\n");
         return 1;
     }
     if (zoom <= 0) {
-        fprintf(stderr, "Invalid zoom value");
+        fprintf(stderr, "Invalid zoom value\n");
         return 1;
     }
     if (speed < 1) {
-        fprintf(stderr, "Invalid speed value");
+        fprintf(stderr, "Invalid speed value\n");
         return 1;
     }
 	ListNode loop;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
-	gif->default_delay = delay;
+	gif->default_delay = delay/10;
 
 	// Δημιουργούμε ενα animation με ένα "cell" το οποίο μετακινείται από τη δεξιά-πάνω
 	// γωνία προς την κάτω-αριστερά. Το cell μετακινείται ένα pixel τη φορά, οπότε το animation
@@ -78,19 +78,20 @@ int main(int argc, char *argv[]) {
 				bm_fill(bitmap, cell.x, cell.y);
 			}
 			// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
+			bm_flip_vertical(bitmap);
 			gif_add_frame(gif, bitmap);
 		}
         if (list_next(list, node) == LIST_EOF) {
             if (loop) {
                 node = loop;
             }
-            else {
-				printf("This shouldn't happen");
-				return 2;
-                break;
-            }
+//            else {
+//				printf("This shouldn't happen");
+//				return 2;
+//                break;
+//            }
         }
-        else if (list_next(list, node) != LIST_EOF){
+        else if (list_next(list, node) != LIST_EOF) {
             node = list_next(list, node);
         }
     }

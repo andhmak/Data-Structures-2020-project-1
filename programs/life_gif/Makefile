@@ -10,7 +10,7 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = life_gif.o $(LIB)/k08.a $(LIB)/libbmp.a $(MODULES)/life.o
+OBJS = life_gif.o $(MODULES)/life.o $(LIB)/k08.a $(LIB)/libbmp.a  #<-----------for some reason if life.o is in the end it doesn't work
 
 # Το εκτελέσιμο πρόγραμμα
 EXEC = life_gif
@@ -20,6 +20,9 @@ ARGS =
 
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
+
+$(MODULES)/life.o: $(MODULES)/life.c
+	$(CC) $(MODULES)/life.c -c -o $(MODULES)/life.o $(CFLAGS)
 
 # Για να φτιάξουμε το k08.a, τρέχουμε το make στο lib directory.
 $(LIB)/k08.a:
