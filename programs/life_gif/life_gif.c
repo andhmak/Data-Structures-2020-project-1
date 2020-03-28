@@ -26,17 +26,21 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 	ListNode loop;
-	List list = life_evolve_many(state, frames/speed, &loop);
+	List list = life_evolve_many(state, (frames - 1)*speed + 1, &loop);
 	LifeCell cell;
 	// Μεγέθη
 //	int size = 128;
 //	int cell_size = 5;
 
 	// Δημιουργία ενός GIF και ενός bitmap στη μνήμη
-	GIF* gif = gif_create(round(zoom*(right - left)), round(zoom*(top - bottom)));
+	GIF* gif;
 	Bitmap* bitmap;
 	if (zoom >= 1) {
+		gif = gif_create(int_zoom*(right - left), int_zoom*(top - bottom));
 		bitmap = bm_create(int_zoom*(right - left), int_zoom*(top - bottom));
+	}
+	else {
+
 	}
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
@@ -45,33 +49,44 @@ int main(int argc, char *argv[]) {
 	// Δημιουργούμε ενα animation με ένα "cell" το οποίο μετακινείται από τη δεξιά-πάνω
 	// γωνία προς την κάτω-αριστερά. Το cell μετακινείται ένα pixel τη φορά, οπότε το animation
 	// θα έχει τόσα frames όσα το μέθεθος της εικόνας.
-
-	for (ListNode node = list_first(list);  ; ) {
-		state = list_node_value(list, node);
-		// Σε κάθε frame, πρώτα ασπρίζουμε ολόκληρο το bitmap
-		bm_set_color(bitmap, bm_atoi("white"));
-		bm_clear(bitmap);
-		bm_set_color(bitmap, bm_atoi("black"));
-		if (zoom >= 1) {
-	        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
-				cell = state_node_cell(state, node);
-				// Και μετά ζωγραφίζουμε ένα μάυρο τετράγωνο με αρχή το
-				// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
-				if ((cell.x > left) && (cell.x < right) && (cell.y > bottom) && (cell.y < top)) {
-					bm_fillrect(bitmap, cell.x - (int_zoom - 1)/2 - left, cell.y - (int_zoom - 1)/2 - bottom, cell.x + (int_zoom)/2 - left, cell.y + (int_zoom)/2 - bottom);
+	ListNode node = list_first(list);
+	for (uint i = 0 ; i < (frames - 1)*speed + 1 ; i++) {
+		if ((i % speed) == 0) {
+			state = list_node_value(list, node);
+			// Σε κάθε frame, πρώτα ασπρίζουμε ολόκληρο το bitmap
+			bm_set_color(bitmap, bm_atoi("white"));
+			bm_clear(bitmap);
+			bm_set_color(bitmap, bm_atoi("black"));
+			if (zoom >= 1) {
+		        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
+					cell = state_node_cell(state, node);
+					// Και μετά ζωγραφίζουμε ένα μάυρο τετράγωνο με αρχή το
+					// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
+					if (cell.y < bottom) { //<----or cell.y = bottom && cell.x > right
+						break;
+					}
+					if ((cell.x > left) && (cell.x < right) && (cell.y < top)) {
+						bm_fillrect(bitmap,
+						(cell.x - left)*int_zoom,
+						(cell.y - bottom)*int_zoom,
+						(cell.x - left)*int_zoom + int_zoom - 1,
+						(cell.y - bottom)*int_zoom + int_zoom - 1);
+					}
 				}
 			}
-		}
-		else {
+			else {
 
+			}
+			// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
+			gif_add_frame(gif, bitmap);
 		}
-		// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
-		gif_add_frame(gif, bitmap);
         if (list_next(list, node) == LIST_EOF) {
             if (loop) {
                 node = loop;
             }
             else {
+				printf("This shouldn't happen");
+				return 2;
                 break;
             }
         }
