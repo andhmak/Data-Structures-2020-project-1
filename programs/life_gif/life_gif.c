@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			else {
-
+				bm_fill(bitmap, cell.x, cell.y);
 			}
 			// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
 			gif_add_frame(gif, bitmap);
