@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
     float zoom = atof(argv[7]);
 	int int_zoom = round(zoom);
 	int zoom_out = round(1/zoom);
-	uint live_cells[(right - left)/zoom_out][(top - bottom)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case
-	for (uint i = 0 ; i < (right - left)/zoom_out ; i++) {
+	uint live_cells[(right - left)/zoom_out][(top - bottom)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case (no significant difference time-wise in tiher case)
+	for (uint i = 0 ; i < (right - left)/zoom_out ; i++) {             //<-----maybe put an if on that loop so it doesn't run when zoom >= 1
 		for (uint j = 0 ; j < (top - bottom)/zoom_out ; j++) {
 			live_cells[i][j] = 0;
 		}
@@ -71,13 +71,17 @@ int main(int argc, char *argv[]) {
 			bm_set_color(bitmap, bm_atoi("black"));
 			if (i == 0) {
 				bm_putpixel(bitmap, 0, 0);
+				gif_add_frame(gif, bitmap);
+				bm_set_color(bitmap, bm_atoi("white"));
+				bm_clear(bitmap);
+				bm_set_color(bitmap, bm_atoi("black"));
 			}
 			if (zoom >= 1) {
 		        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
 					cell = state_node_cell(state, node);
 					// Και μετά ζωγραφίζουμε ένα μάυρο τετράγωνο με αρχή το
 					// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
-					if (cell.y < bottom) { //<----or cell.y = bottom && cell.x > right
+					if ((cell.y < bottom)) { //<----or cell.y = bottom && cell.x > right (try again later, no significant difference either way)
 						break;
 					}
 //					printf("x: %d, y: %d\n", cell.x, cell.y);
@@ -143,4 +147,5 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-//<----maybe also remember frames if loop, not only states. no need to generate the same frames over and over.
+//<----maybe also remember frames if loop, not only states. no need to generate the same frames over and over. Maybe use same method with map and list as life_evolve_many.
+//<----Seems most of the time goes into freeing. Didn't expect that. Probably a good sign. Potentially a very bad sign.
