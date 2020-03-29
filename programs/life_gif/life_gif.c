@@ -59,6 +59,8 @@ int main(int argc, char *argv[]) {
 	// Δημιουργούμε ενα animation με ένα "cell" το οποίο μετακινείται από τη δεξιά-πάνω
 	// γωνία προς την κάτω-αριστερά. Το cell μετακινείται ένα pixel τη φορά, οπότε το animation
 	// θα έχει τόσα frames όσα το μέθεθος της εικόνας.
+//	bm_set_color(bitmap, bm_atoi("black"));
+//	gif_add_frame(gif, bitmap);
 	ListNode node = list_first(list);
 	for (uint i = 0 ; i < (frames - 1)*speed + 1 ; i++) {
 		if ((i % speed) == 0) {
@@ -93,11 +95,19 @@ int main(int argc, char *argv[]) {
 					if (cell.y < bottom) { //<----or cell.y = bottom && cell.x > right
 						break;
 					}
+//					printf("zoom_out: %d\n",zoom_out);
+//					printf("cell.x: %d\n", cell.x);
+//					printf("cell.y: %d\n", cell.y);
+//					printf("left: %d\n", left);
+//					printf("right: %d\n", right);
+//					printf("top: %d\n", top);
+//					printf("bottom: %d\n", bottom);
+//					printf("truth: %d\n", (cell.x >= left) && (cell.x < (right)) && (cell.y < (top)));
 					//<----maybe don't check if more than half already filled
-					if ((cell.x >= left) && (cell.x - left < (right - left)/zoom_out) && (cell.y - bottom < (top - bottom)/zoom_out)) {
+					if ((cell.x >= left) && ((cell.x - left)/zoom_out <= (right - left)/zoom_out) && ((cell.y - bottom)/zoom_out <= (top - bottom)/zoom_out)) {
 						live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out]++;
 						if (live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out] > zoom_out*zoom_out/2) {
-							bm_fill(bitmap, cell.x - left, cell.y - bottom);
+							bm_putpixel(bitmap, (cell.x - left)/zoom_out, (cell.y - bottom)/zoom_out);
 						}
 					}
 				}
