@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
 					}
 					//<----maybe don't check if more than half already filled
 					if ((cell.x >= left) && (cell.x - left < (right - left)/zoom_out) && (cell.y - bottom < (top - bottom)/zoom_out)) {
-						live_cells[cell.x/zoom_out][cell.y/zoom_out]++;
-						if (live_cells[cell.x/zoom_out][cell.y/zoom_out] > zoom_out*zoom_out/2) {
+						live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out]++;
+						if (live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out] > zoom_out*zoom_out/2) {
 							bm_fill(bitmap, cell.x - left, cell.y - bottom);
 						}
 					}
