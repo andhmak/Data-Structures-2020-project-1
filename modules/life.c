@@ -104,7 +104,7 @@ LifeState life_create_from_rle(char* file) {
 		}
 		else if (ch == '$') {
 			x = 0;
-			y--;
+			y -= num;
 		}
 		else if (ch == '!') {
 			break;

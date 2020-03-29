@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 	Bitmap* bitmap = bm_create(size, size);
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
-	gif->default_delay = 10;
+	gif->default_delay = 1;
 
 	// Δημιουργούμε ενα animation με ένα "cell" το οποίο μετακινείται από τη δεξιά-πάνω
 	// γωνία προς την κάτω-αριστερά. Το cell μετακινείται ένα pixel τη φορά, οπότε το animation

@@ -6,12 +6,21 @@
 #include "life.h"
 
 //ideas: don't calculate anything outside one cell out of borders, pass argument in life_evolve_many to do so, break up grid to find areas with loops
+//<------make zoom limit 0.67 instead of 1
+
 
 int main(int argc, char *argv[]) {
     LifeState state = life_create_from_rle(argv[1]);
     int top = atoi(argv[2]), left = atoi(argv[3]), bottom = atoi(argv[4]), right = atoi(argv[5]), frames = atoi(argv[6]), speed = atoi(argv[8]), delay = atoi(argv[9]);
     float zoom = atof(argv[7]);
 	int int_zoom = round(zoom);
+	int zoom_out = round(1/zoom);
+	uint live_cells[(right - left)/zoom_out][(top - bottom)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case
+	for (uint i = 0 ; i < (right - left)/zoom_out ; i++) {
+		for (uint j = 0 ; j < (top - bottom)/zoom_out ; j++) {
+			live_cells[i][j] = 0;
+		}
+	}
     char *gif_name = argv[10];
     if (frames < 1) {
         fprintf(stderr, "Invalid frames value\n");
@@ -40,7 +49,8 @@ int main(int argc, char *argv[]) {
 		bitmap = bm_create(int_zoom*(right - left), int_zoom*(top - bottom));
 	}
 	else {
-		
+		gif = gif_create((right - left)/zoom_out, (top - bottom)/zoom_out);
+		bitmap = bm_create((right - left)/zoom_out, (top - bottom)/zoom_out);
 	}
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
@@ -65,7 +75,8 @@ int main(int argc, char *argv[]) {
 					if (cell.y < bottom) { //<----or cell.y = bottom && cell.x > right
 						break;
 					}
-					if ((cell.x > left) && (cell.x < right) && (cell.y < top)) {
+//					printf("x: %d, y: %d\n", cell.x, cell.y);
+					if ((cell.x >= left) && (cell.x < right) && (cell.y < top)) {
 						bm_fillrect(bitmap,
 						(cell.x - left)*int_zoom,
 						(cell.y - bottom)*int_zoom,
@@ -75,7 +86,21 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			else {
-				bm_fill(bitmap, cell.x, cell.y);
+				for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
+					cell = state_node_cell(state, node);
+					// Και μετά ζωγραφίζουμε ένα μάυρο τετράγωνο με αρχή το
+					// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
+					if (cell.y < bottom) { //<----or cell.y = bottom && cell.x > right
+						break;
+					}
+					//<----maybe don't check if more than half already filled
+					if ((cell.x >= left) && (cell.x - left < (right - left)/zoom_out) && (cell.y - bottom < (top - bottom)/zoom_out)) {
+						live_cells[cell.x/zoom_out][cell.y/zoom_out]++;
+						if (live_cells[cell.x/zoom_out][cell.y/zoom_out] > zoom_out*zoom_out/2) {
+							bm_fill(bitmap, cell.x - left, cell.y - bottom);
+						}
+					}
+				}
 			}
 			// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
 			bm_flip_vertical(bitmap);
@@ -95,12 +120,13 @@ int main(int argc, char *argv[]) {
             node = list_next(list, node);
         }
     }
-
+	list_destroy(list);
 	// Αποθήκευση σε αρχείο
 	gif_save(gif, gif_name);
-
 	// Αποδέσμευση μνήμης
 	bm_free(bitmap);
 	gif_free(gif);
     return 0;
 }
+
+//<----maybe also remember frames if loop, not only states. no need to generate the same frames over and over.
