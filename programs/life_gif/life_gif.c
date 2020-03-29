@@ -69,6 +69,9 @@ int main(int argc, char *argv[]) {
 			bm_set_color(bitmap, bm_atoi("white"));
 			bm_clear(bitmap);
 			bm_set_color(bitmap, bm_atoi("black"));
+			if (i == 0) {
+				bm_putpixel(bitmap, 0, 0);
+			}
 			if (zoom >= 1) {
 		        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
 					cell = state_node_cell(state, node);
@@ -104,6 +107,7 @@ int main(int argc, char *argv[]) {
 //					printf("bottom: %d\n", bottom);
 //					printf("truth: %d\n", (cell.x >= left) && (cell.x < (right)) && (cell.y < (top)));
 					//<----maybe don't check if more than half already filled
+					//<---the "if" for zoom can be moved fartehr in or out, it's a balance between cleaner code and speed (as the if will be evaluated less times)
 					if ((cell.x >= left) && ((cell.x - left)/zoom_out <= (right - left)/zoom_out) && ((cell.y - bottom)/zoom_out <= (top - bottom)/zoom_out)) {
 						live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out]++;
 						if (live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out] > zoom_out*zoom_out/2) {
