@@ -148,4 +148,4 @@ int main(int argc, char *argv[]) {
 }
 
 //<----maybe also remember frames if loop, not only states. no need to generate the same frames over and over. Maybe use same method with map and list as life_evolve_many.
-//<----Seems most of the time goes into freeing. Didn't expect that. Probably a good sign. Potentially a very bad sign.
+//<----Seems most of the time goes into gif_save. Didn't expect that. Probably a good sign. Potentially a very bad sign.
