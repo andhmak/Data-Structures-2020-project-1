@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 //					printf("top: %d\n", top);
 //					printf("bottom: %d\n", bottom);
 //					printf("truth: %d\n", (cell.x >= left) && (cell.x < (right)) && (cell.y < (top)));
-					//<----maybe don't check if more than half already filled
+					//<---maybe don't check if more than half already filled
 					//<---the "if" for zoom can be moved fartehr in or out, it's a balance between cleaner code and speed (as the if will be evaluated less times)
 					if ((cell.x >= left) && ((cell.x - left)/zoom_out <= (right - left)/zoom_out) && ((cell.y - bottom)/zoom_out <= (top - bottom)/zoom_out)) {
 						live_cells[(cell.x - left)/zoom_out][(cell.y - bottom)/zoom_out]++;
