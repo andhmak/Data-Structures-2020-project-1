@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////
-
+//
 // Παράδειγμα δημιουργίας ενός GIF χρησιμοποιώντας τη βιβλιοθήκη libbmp
-
+//
 ///////////////////////////////////////////////////////////////////////// 
 
 #include "bmp.h"
@@ -27,12 +27,10 @@ int main(int argc, char *argv[]) {
 		// Σε κάθε frame, πρώτα μαυρίζουμε ολόκληρο το bitmap
 		bm_set_color(bitmap, bm_atoi("black"));
 		bm_clear(bitmap);
+
 		// Και μετά ζωγραφίζουμε ένα άσπρο τετράγωνο με αρχή το
 		// σημείο (i,i) και τέλος το (i+cell_size, i+cell_size)
 		bm_set_color(bitmap, bm_atoi("white"));
-		if (i == 0) {
-			bm_clear(bitmap);
-		}
 		bm_fillrect(bitmap, i, i, i+cell_size, i+cell_size);
    
 		// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)

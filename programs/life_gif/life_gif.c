@@ -55,6 +55,9 @@ int main(int argc, char *argv[]) {
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
 	gif->default_delay = delay/10;
+	// Ορίζουμε τα χρώματα που χρησιμοποιούνται στο GIF (αλλιώς παίρνει αυτά που υπάρχουν στο πρώτο frame)
+	unsigned int palette[] = { 0xFF000000, 0xFFFFFFFF }; // black, white
+	gif_set_palette(gif, palette, 2);
 
 	// Δημιουργούμε ενα animation με ένα "cell" το οποίο μετακινείται από τη δεξιά-πάνω
 	// γωνία προς την κάτω-αριστερά. Το cell μετακινείται ένα pixel τη φορά, οπότε το animation
@@ -69,13 +72,6 @@ int main(int argc, char *argv[]) {
 			bm_set_color(bitmap, bm_atoi("white"));
 			bm_clear(bitmap);
 			bm_set_color(bitmap, bm_atoi("black"));
-			if (i == 0) {
-				bm_putpixel(bitmap, 0, 0);
-				gif_add_frame(gif, bitmap);
-				bm_set_color(bitmap, bm_atoi("white"));
-				bm_clear(bitmap);
-				bm_set_color(bitmap, bm_atoi("black"));
-			}
 			if (zoom >= 1) {
 		        for (StateNode node = state_first(state) ; node != STATE_EOF ; node = state_next(state, node)) {
 					cell = state_node_cell(state, node);
