@@ -62,8 +62,6 @@ int main(int argc, char *argv[]) {
 	// Δημιουργούμε ενα animation με ένα "cell" το οποίο μετακινείται από τη δεξιά-πάνω
 	// γωνία προς την κάτω-αριστερά. Το cell μετακινείται ένα pixel τη φορά, οπότε το animation
 	// θα έχει τόσα frames όσα το μέθεθος της εικόνας.
-//	bm_set_color(bitmap, bm_atoi("black"));
-//	gif_add_frame(gif, bitmap);
 	ListNode node = list_first(list);
 	for (uint i = 0 ; i < (frames - 1)*speed + 1 ; i++) {
 		if ((i % speed) == 0) {
