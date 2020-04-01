@@ -171,6 +171,7 @@ void test_iteration(void) {
         cell = state_node_cell(state, node);
         printf("\nx: %d, y: %d\n", cell.x, cell.y);
     }
+    life_destroy(state);
 }
 
 // Λίστα με όλα τα tests προς εκτέλεση

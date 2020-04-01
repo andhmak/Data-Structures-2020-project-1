@@ -208,9 +208,12 @@ void life_set_cell(LifeState state, LifeCell cell, bool value) {
 	}
 }
 
+void life_destroy(LifeState state);
+
 // Παράγει μια νέα κατάσταση που προκύπτει από την εξέλιξη της κατάστασης state
 LifeState life_evolve(LifeState state) {
 	LifeState newstate = life_create();
+	LifeState deadcells = life_create();
 	LifeCell cell, tmpcell;
 	int num, i, j, k, l;
 	for (SetNode node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
@@ -219,26 +222,32 @@ LifeState life_evolve(LifeState state) {
 				cell = *(LifeCell *)set_node_value(state->set, node);
 				cell.x += i;
 				cell.y += j;
-				num = 0;
-				for (k = -1 ; k <= 1 ; k++) {
-					for (l = -1 ; l <= 1 ; l++) {
-						if ((k == 0) && (l == 0)) {
-							continue;
-						}
-						tmpcell = cell;
-						tmpcell.x += k;
-						tmpcell.y += l;
-						if (life_get_cell(state, tmpcell)) {
-							num++;
+				if ((!life_get_cell(newstate, cell)) && (!life_get_cell(deadcells, cell))) {
+					num = 0;
+					for (k = -1 ; k <= 1 ; k++) {
+						for (l = -1 ; l <= 1 ; l++) {
+							if ((k == 0) && (l == 0)) {
+								continue;
+							}
+							tmpcell = cell;
+							tmpcell.x += k;
+							tmpcell.y += l;
+							if (life_get_cell(state, tmpcell)) {
+								num++;
+							}
 						}
 					}
-				}
-				if ((num == 3) || ((num == 2) && life_get_cell(state, cell))) {
-					life_set_cell(newstate, cell, true);
+					if ((num == 3) || ((num == 2) && life_get_cell(state, cell))) {
+						life_set_cell(newstate, cell, true);
+					}
+					else {
+						life_set_cell(deadcells, cell, true);
+					}
 				}
 			}
 		}
 	}
+	life_destroy(deadcells);
 	return newstate;
 }
 
