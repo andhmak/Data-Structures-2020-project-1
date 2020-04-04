@@ -6,7 +6,7 @@
 #include "life.h"
 
 //ideas: don't calculate anything outside one cell out of borders, pass argument in life_evolve_many to do so, break up grid to find areas with loops
-//<------make zoom limit 0.67 instead of 1
+//<------make zoom limit 0.67 instead of 1 //doesn't seem to help, both with many frames and high speed (many evoluctions)
 
 
 int main(int argc, char *argv[]) {
@@ -16,10 +16,11 @@ int main(int argc, char *argv[]) {
 	int int_zoom = round(zoom);
 	int zoom_out = round(1/zoom);
 	uint live_cells[(right - left)/zoom_out][(top - bottom)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case (no significant difference time-wise in tiher case)
-	for (uint i = 0 ; i < (right - left)/zoom_out ; i++) {             //<-----maybe put an if on that loop so it doesn't run when zoom >= 1
+	if (zoom < 1) {for (uint i = 0 ; i < (right - left)/zoom_out ; i++) {             //<-----maybe put an if on that loop so it doesn't run when zoom >= 1
 		for (uint j = 0 ; j < (top - bottom)/zoom_out ; j++) {
 			live_cells[i][j] = 0;
 		}
+	}
 	}
     char *gif_name = argv[10];
     if (frames < 1) {
@@ -45,12 +46,12 @@ int main(int argc, char *argv[]) {
 	GIF* gif;
 	Bitmap* bitmap;
 	if (zoom >= 1) {
-		gif = gif_create(int_zoom*(right - left), int_zoom*(top - bottom));
-		bitmap = bm_create(int_zoom*(right - left), int_zoom*(top - bottom));
+		gif = gif_create(int_zoom*(right - left + 1), int_zoom*(top - bottom + 1));
+		bitmap = bm_create(int_zoom*(right - left + 1), int_zoom*(top - bottom + 1));
 	}
 	else {
-		gif = gif_create((right - left)/zoom_out, (top - bottom)/zoom_out);
-		bitmap = bm_create((right - left)/zoom_out, (top - bottom)/zoom_out);
+		gif = gif_create((right - left + 1)/zoom_out, (top - bottom + 1)/zoom_out);
+		bitmap = bm_create((right - left + 1)/zoom_out, (top - bottom + 1)/zoom_out);
 	}
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
@@ -79,7 +80,7 @@ int main(int argc, char *argv[]) {
 						break;
 					}
 //					printf("x: %d, y: %d\n", cell.x, cell.y);
-					if ((cell.x >= left) && (cell.x < right) && (cell.y < top)) {
+					if ((cell.x >= left) && (cell.x <= right) && (cell.y <= top)) {
 						bm_fillrect(bitmap,
 						(cell.x - left)*int_zoom,
 						(cell.y - bottom)*int_zoom,
