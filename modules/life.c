@@ -42,15 +42,15 @@ typedef struct life_state* LifeState;
 struct life_state {
 	Set set;
 };
-
+//faster witheut comparing size
 int compare_states(LifeState a, LifeState b) {
-	if (set_size(a->set) < set_size(b->set)) {
-		return -1;
-	}
-	else if (set_size(a->set) > set_size(b->set)) {
-		return 1;
-	}
-	else {
+//	if (set_size(a->set) < set_size(b->set)) {
+//		return -1;
+//	}
+//	else if (set_size(a->set) > set_size(b->set)) {
+//		return 1;
+//	}
+//	else {
 		int i;
 		for (SetNode node1 = set_first(a->set), node2 = set_first(b->set) ; node1 != SET_EOF ; node1 = set_next(a->set, node1), node2 = set_next(b->set, node2)) {
 			if ((i = compare_cells(set_node_value(a->set, node1), set_node_value(b->set, node2))) != 0) {
@@ -58,7 +58,7 @@ int compare_states(LifeState a, LifeState b) {
 			}
 		}
 		return 0;
-	}
+//	}
 }
 
 // Δημιουργεί μια κατάσταση του παιχνιδιού όπου όλα τα κελιά είναι νεκρά.
@@ -68,11 +68,23 @@ LifeState life_create() {
 	return state;
 }
 
-void life_set_cell(LifeState state, LifeCell cell, bool value);
+// Αλλάζει την τιμή του κελιού cell στην κατάσταση state
+void life_set_cell(LifeState state, LifeCell cell, bool value) {
+	if (value) {
+		set_insert(state->set, create_cell(cell));
+	}
+	else {
+		set_remove(state->set, &cell);
+	}
+}
 
 // Δημιουργεί μία κατάσταση του παιχνιδιού με βάση τα δεδομένα του αρχείο file (RLE format)
 LifeState life_create_from_rle(char* file) {
-	FILE *stream = fopen(file, "rb");
+	FILE *stream;
+	if ((stream = fopen(file, "rb")) == NULL) {
+		fprintf(stderr, "Invalid input file\n");
+		exit(-1);
+	}
 	LifeCell cell;
 	LifeState state = life_create();
 	int x = 0, y = 0, num;
@@ -120,7 +132,11 @@ LifeState life_create_from_rle(char* file) {
 
 // Αποθηκεύει την κατάσταση state στο αρχείο file (RLE format)
 void life_save_to_rle(LifeState state, char* file) {
-	FILE *stream = fopen(file, "wb");
+	FILE *stream;
+	if ((stream = fopen(file, "wb")) == NULL) {
+		fprintf(stderr, "Invalid destination file\n");
+		exit(-1);
+	}
 	int leftmost = __INT_MAX__, num = 0;
 	SetNode node, prevnode;
 	for (node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
@@ -198,17 +214,11 @@ bool life_get_cell(LifeState state, LifeCell cell) {
 	return set_find(state->set, &cell);
 }
 
-// Αλλάζει την τιμή του κελιού cell στην κατάσταση state
-void life_set_cell(LifeState state, LifeCell cell, bool value) {
-	if (value) {
-		set_insert(state->set, create_cell(cell));
-	}
-	else {
-		set_remove(state->set, &cell);
-	}
+// Καταστρέφει την κατάσταση ελευθερώντας οποιαδήποτε μνήμη έχει δεσμευτεί
+void life_destroy(LifeState state) {
+	set_destroy(state->set);
+	free(state);
 }
-
-void life_destroy(LifeState state);
 
 // Παράγει μια νέα κατάσταση που προκύπτει από την εξέλιξη της κατάστασης state
 LifeState life_evolve(LifeState state) {
@@ -251,26 +261,20 @@ LifeState life_evolve(LifeState state) {
 	return newstate;
 }
 
-// Καταστρέφει την κατάσταση ελευθερώντας οποιαδήποτε μνήμη έχει δεσμευτεί
-void life_destroy(LifeState state) {
-	set_destroy(state->set);
-	free(state);
-}
+//typedef struct {
+//	ListNode node;
+//	LifeState state;
+//} statenode;
 
-typedef struct {
-	ListNode node;
-	LifeState state;
-} statenode;
+//int compare_statenodes(statenode *a, statenode *b) {
+//	return compare_states(a->state, b->state);
+//}
 
-int compare_statenodes(statenode *a, statenode *b) {
-	return compare_states(a->state, b->state);
-}
-
-statenode *create_statenode(statenode a) {
-	statenode* p = malloc(sizeof(statenode));
-	*p = a;
-	return p;
-}
+//statenode *create_statenode(statenode a) {
+//	statenode* p = malloc(sizeof(statenode));
+//	*p = a;
+//	return p;
+//}
 
 // Επιστρέφει μία λίστα από το πολύ steps εξελίξεις, ξεκινώνας από την κατάσταση
 // state. Αν βρεθεί επανάληψη τότε στο *loop αποθηκεύεται ο κόμβος στον οποίο

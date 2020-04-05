@@ -15,14 +15,19 @@ int main(int argc, char *argv[]) {
     float zoom = atof(argv[7]);
 	int int_zoom = round(zoom);
 	int zoom_out = round(1/zoom);
-	uint live_cells[(right - left)/zoom_out][(top - bottom)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case (no significant difference time-wise in tiher case)
-	if (zoom < 1) {for (uint i = 0 ; i < (right - left)/zoom_out ; i++) {             //<-----maybe put an if on that loop so it doesn't run when zoom >= 1
-		for (uint j = 0 ; j < (top - bottom)/zoom_out ; j++) {
-			live_cells[i][j] = 0;
+	uint live_cells[(right - left + 1)/zoom_out][(top - bottom + 1)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case (no significant difference time-wise in either case)
+	if (zoom < 1) {
+		for (uint i = 0 ; i < (right - left + 1)/zoom_out ; i++) {             //<-----maybe put an if on that loop so it doesn't run when zoom >= 1
+			for (uint j = 0 ; j < (top - bottom + 1)/zoom_out ; j++) {
+				live_cells[i][j] = 0;
+			}
 		}
 	}
-	}
     char *gif_name = argv[10];
+	if ((right < left) || (top < bottom)) {
+		fprintf(stderr, "Invalid borders\n");
+        return 1;
+	}
     if (frames < 1) {
         fprintf(stderr, "Invalid frames value\n");
         return 1;
@@ -35,12 +40,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Invalid speed value\n");
         return 1;
     }
+	if (delay < 10) {
+        fprintf(stderr, "Lower delays than 10ms not supported by gif library\n");
+        return 1;
+    }
 	ListNode loop;
 	List list = life_evolve_many(state, (frames - 1)*speed + 1, &loop);
 	LifeCell cell;
-	// Μεγέθη
-//	int size = 128;
-//	int cell_size = 5;
 
 	// Δημιουργία ενός GIF και ενός bitmap στη μνήμη
 	GIF* gif;
@@ -56,6 +62,7 @@ int main(int argc, char *argv[]) {
 
 	// Default καθυστέρηση μεταξύ των frames, σε εκατοστά του δευτερολέπτου
 	gif->default_delay = delay/10;
+	
 	// Ορίζουμε τα χρώματα που χρησιμοποιούνται στο GIF (αλλιώς παίρνει αυτά που υπάρχουν στο πρώτο frame)
 	unsigned int palette[] = { 0xFF000000, 0xFFFFFFFF }; // black, white
 	gif_set_palette(gif, palette, 2);
