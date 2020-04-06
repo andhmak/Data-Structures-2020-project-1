@@ -122,8 +122,9 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
-			// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
+			// Αντιστρέφουμε το bitmap γιατί στον κατακόρυφο άξονα "γράφει" από πάνω προς τα κάτω
 			bm_flip_vertical(bitmap);
+			// Τέλος προσθέτουμε το bitmap σαν frame στο GIF (τα περιεχόμενα αντιγράφονται)
 			gif_add_frame(gif, bitmap);
 		}
         if (list_next(list, node) == LIST_EOF) {
@@ -140,10 +141,11 @@ int main(int argc, char *argv[]) {
             node = list_next(list, node);
         }
     }
+	// Αποδέσμευση μνήμης λίστας
 	list_destroy(list);
 	// Αποθήκευση σε αρχείο
 	gif_save(gif, gif_name);
-	// Αποδέσμευση μνήμης
+	// Αποδέσμευση bitmap και gif
 	bm_free(bitmap);
 	gif_free(gif);
     return 0;

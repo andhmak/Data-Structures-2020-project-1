@@ -2,6 +2,7 @@
 #include "ADTSet.h"
 #include "ADTList.h"
 
+// Τύπος "κελί"
 typedef struct {
 	int x, y;
 } LifeCell;
@@ -33,6 +34,8 @@ void life_destroy(LifeState state);
 // state. Αν βρεθεί επανάληψη τότε στο *loop αποθηκεύεται ο κόμβος στον οποίο
 // συνεχίζει η εξέλιξη μετά τον τελευταίο κόμβο της λίστας, διαφορετικά NULL
 List life_evolve_many(LifeState state, int steps, ListNode* loop);
+
+// Τα παρακάτω επιτρέπουν επαναληπτικές μεθόδους, διασχίζοντας τα ζωντανά κελιά μιας κατάστασης
 
 typedef SetNode StateNode;
 

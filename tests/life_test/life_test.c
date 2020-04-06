@@ -11,10 +11,13 @@
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
 #include "life.h"
 
-
+// Test για την life_create
 void test_create(void) {
+    // δημιουργία αρχικής κατάστασης
     LifeState state = life_create();
+    // έλεγχος για το αν δημιουργήθηκε όντως κάποια κατάσταση
     TEST_CHECK(state != NULL);
+    // έλεγχος σε 20 τυχαία κελιά ότι δεν είναι ζωντανά, εφόσον πρέπει να είναι όλα νεκρά
     LifeCell cell;
     srand(time(NULL));
     for (int i = 0 ; i < 20 ; i++) {
@@ -22,11 +25,16 @@ void test_create(void) {
         cell.y = rand();
         TEST_CHECK(life_get_cell(state, cell) == false);
     }
+    // απελευθέρωση μνήμης
     life_destroy(state);
 }
 
+// Test για τις life_get_cell και life_set_cell
 void test_get_set_cell(void) {
+    // δημιουργία αρχικής κατάστασης
     LifeState state = life_create();
+    // "άναμμα"  20 τυχαίων κελιών και έλεγχος ότι φαίνονται ως
+    // ζωντανά, σβήσιμο και έλεγχος ότι φαίνονται ως νεκρά
     LifeCell cell;
     srand(time(NULL));
     for (int i = 0 ; i < 20 ; i++) {
@@ -37,11 +45,15 @@ void test_get_set_cell(void) {
         life_set_cell(state, cell, false);
         TEST_CHECK(life_get_cell(state, cell) == false);
     }
+    // απελευθέρωση μνήμης
     life_destroy(state);
 }
 
+// Test για την life_create_from_rle
 void test_create_from_rle(void) {
+    // δημιουργία κατάστασης από γνωστό rle (glider)
     LifeState state = life_create_from_rle("glider.rle");
+    // έλεγχος των κελιών της κατάστασης ότι είναι τα αναμενόμενα
     LifeCell cell;
     cell.x = 0;
     cell.y = 0;
@@ -70,19 +82,36 @@ void test_create_from_rle(void) {
     cell.x = 2;
     cell.y = -2;
     TEST_CHECK(life_get_cell(state, cell) == true);
+    // απελευθέρωση μνήμης
     life_destroy(state);
 }
 
+// Test για την life_save_to_rle
 void test_save_to_rle(void) {
-    LifeState state = life_create_from_rle("glider.rle");
-    life_save_to_rle(state, "glidertest.rle");
-    FILE *test = fopen("glidertest.rle", "rb");
+    // Δημιουργία κενής κατάστασης
+    LifeState state = life_create();
+    // "σώσιμο" κατάστασης σε αρχείο rle
+    life_save_to_rle(state, "emptytest.rle");
+    // διάβασμα του αρχείου και έλεγχος ότι είναι το αναμενόμενο
+    FILE *test = fopen("emptytest.rle", "rb");
     char string[100];
+    fscanf(test, "%s", string);
+    TEST_CHECK(strcmp(string, "!") == 0);
+    fclose(test);
+    // διαγραφή παραγμένου αρχείου
+    remove("emptytest.rle");
+    // απελευθέρωση μνήμης κατάστασης
+    life_destroy(state);
+    // το ίδιο για κατάσταση από γνωστό rle (glider)
+    state = life_create_from_rle("glider.rle");
+    life_save_to_rle(state, "glidertest.rle");
+    test = fopen("glidertest.rle", "rb");
     fscanf(test, "%s", string);
     TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
     fclose(test);
     remove("glidertest.rle");
     life_destroy(state);
+    // ξανά αλλά τώρα για gun
     state = life_create_from_rle("gun.rle");
     life_save_to_rle(state, "guntest.rle");
     test = fopen("guntest.rle", "rb");
@@ -93,17 +122,23 @@ void test_save_to_rle(void) {
     life_destroy(state);
 }
 
-void test_evolve(void) {  /* Testing a  full glider cycle */
+// Test για την life_evolve
+void test_evolve(void) {  /* Έλεγχος ενός κύκλου ενός glider */
+    // δημιουργία κατάστασης από rle glider
     LifeState state = life_create_from_rle("glider.rle"), prevstate;
     prevstate = state;
+    // εξέλιξη
     state = life_evolve(state);
+    // απελευθέρωση παλιάς κατάστασης
     life_destroy(prevstate);
+    // έλεγχος ότι το αποτέλεσμα είναι το αναμενόμενο
     life_save_to_rle(state, "gliderevolved.rle");
     FILE *test = fopen("gliderevolved.rle", "rb");
     char string[20];
     fscanf(test, "%s", string);
     TEST_CHECK(strcmp(string, "obo$b2o$bo!") == 0);
     fclose(test);
+    // πάλι για την επόμενη κατάσταση
     prevstate = state;
     state = life_evolve(state);
     life_destroy(prevstate);
@@ -112,6 +147,7 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
     fscanf(test, "%s", string);
     TEST_CHECK(strcmp(string, "2bo$obo$b2o!") == 0);
     fclose(test);
+    // και την επόμενη
     prevstate = state;
     state = life_evolve(state);
     life_destroy(prevstate);
@@ -120,6 +156,7 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
     fscanf(test, "%s", string);
     TEST_CHECK(strcmp(string, "o$b2o$2o!") == 0);
     fclose(test);
+    // μέχρι να κλείσει ένας κύκλος
     prevstate = state;
     state = life_evolve(state);
     life_destroy(prevstate);
@@ -128,6 +165,7 @@ void test_evolve(void) {  /* Testing a  full glider cycle */
     fscanf(test, "%s", string);
     TEST_CHECK(strcmp(string, "bo$2bo$3o!") == 0);
     fclose(test);
+    // διαγραφή παραγμένου αρχείου και απελευθέρωση μνήμης
     remove("gliderevolved.rle");
     life_destroy(state);
 }

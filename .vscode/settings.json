@@ -24,4 +24,7 @@
 		"arg9": "",
 		"arg10": "",
 	},
+	"files.associations": {
+		"adtpriorityqueue.h": "c"
+	},
 }

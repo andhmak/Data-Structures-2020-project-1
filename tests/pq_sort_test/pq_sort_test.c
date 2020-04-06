@@ -6,9 +6,8 @@
 
 #include <limits.h>
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
-
 #include "pq_sort.h"
-
+#include "ADTPriorityQueue.h"
 
 int compare_ints(Pointer a, Pointer b) {
 	return *(int*)a - *(int*)b;
@@ -26,9 +25,9 @@ void test_pq_sort_vector(void) {
 
 	// προσθήκη τυχαίων αριθμών
 	int N = 10;
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++) {
 		vector_insert_last(vec, create_int(rand()));
-
+	}
 	// sort
 	pq_sort_vector(vec, compare_ints);
 
@@ -45,10 +44,16 @@ void test_pq_sort_vector(void) {
 
 void test_pq_sort_list(void) {
 	List list = list_create(free);
+
+	// προσθήκη τυχαίων αριθμών
 	int N = 10;
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++) {
 		list_insert_next(list, LIST_BOF, create_int(rand()));
+	}
+	// sort
 	pq_sort_list(list, compare_ints);
+
+	// έλεγχος ότι οι τιμές είναι σε αύξουσα σειρά
 	int last = INT_MIN;
 	for (ListNode node = list_first(list) ; node != LIST_EOF ; node = list_next(list, node)) {
 		int* current = list_node_value(list, node);
@@ -57,7 +62,6 @@ void test_pq_sort_list(void) {
 	}
 
 	list_destroy(list);
-
 }
 
 
