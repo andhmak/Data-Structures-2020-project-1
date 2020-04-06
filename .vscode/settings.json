@@ -1,7 +1,7 @@
 {
 	"c_project": {
 		// Directory στο οποίο βρίσκεται το πρόγραμμα
-		"dir": "tests",
+		"dir": "tests/life_test",
 
 		// Όνομα του εκτελέσιμου προγράμματος
 		"program": "life_test",

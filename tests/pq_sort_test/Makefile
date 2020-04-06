@@ -1,7 +1,7 @@
 # paths
-LIB = ../lib
-INCLUDE = ../include
-MODULES = ../modules
+LIB = ../../lib
+INCLUDE = ../../include
+MODULES = ../../modules
 
 # compiler
 CC = gcc
@@ -11,10 +11,10 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = life_test.o $(MODULES)/life.o $(LIB)/k08.a
+OBJS = pq_sort_test.o $(MODULES)/pq_sort.o $(LIB)/k08.a
 
 # Το εκτελέσιμο πρόγραμμα
-EXEC = life_test
+EXEC = pq_sort_test
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =
