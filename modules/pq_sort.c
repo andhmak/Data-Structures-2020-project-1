@@ -41,12 +41,13 @@ void pq_sort_list(List list, CompareFunc compare) {
 		pqueue_insert(pqueue, list_node_value(list, node));
 	}
 
-	// καταστροφή της λίστας και δημιουργία καινούργιας με την παλιά destroy
-	list_destroy(list);
-	list = list_create(old_destroy);
+	// άδειασμα της λίστας
+	while(list_size(list)) {
+		list_remove_next(list, LIST_BOF);
+	}
 
-	// Γέμισμα της λίστας με τα στοιχεία της pqueue από το μεγαλύτερο προς το μικρότερο,
-	// βάζοντας το καινούργιο πάντα στην αρχή, άρα τελικά η λίστα έχει τα στοιχεία της κατατεταγμένα με αύξουσα σειρά.
+	// Γέμισμα της λίστας με τα στοιχεία της pqueue από το μεγαλύτερο προς το μικρότερο, βάζοντας
+	// το καινούργιο πάντα στην αρχή, άρα τελικά η λίστα έχει τα στοιχεία της είναι κατατεταγμένα με αύξουσα σειρά.
 	while (pqueue_size(pqueue) > 0) {
 		list_insert_next(list, LIST_BOF, pqueue_max(pqueue));
 		pqueue_remove_max(pqueue);
@@ -54,4 +55,7 @@ void pq_sort_list(List list, CompareFunc compare) {
 
 	// καταστροφή pqueue
 	pqueue_destroy(pqueue);
+
+	// επαναφορά της destroy
+	list_set_destroy_value(list, old_destroy);
 }

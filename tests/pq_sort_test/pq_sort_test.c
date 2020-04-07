@@ -52,7 +52,7 @@ void test_pq_sort_list(void) {
 	}
 	// sort
 	pq_sort_list(list, compare_ints);
-
+	
 	// έλεγχος ότι οι τιμές είναι σε αύξουσα σειρά
 	int last = INT_MIN;
 	for (ListNode node = list_first(list) ; node != LIST_EOF ; node = list_next(list, node)) {
