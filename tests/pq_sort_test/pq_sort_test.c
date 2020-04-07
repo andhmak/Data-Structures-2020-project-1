@@ -13,13 +13,14 @@ int compare_ints(Pointer a, Pointer b) {
 	return *(int*)a - *(int*)b;
 }
 
+// δέσμαυση μνήμης στον σωρό και αποθήκευση ενός ακεραίου
 int* create_int(int value) {
 	int* pointer = malloc(sizeof(int));	// δέσμευση μνήμης
 	*pointer = value;					// αντιγραφή του value στον νέο ακέραιο
 	return pointer;
 }
 
-
+// test pq_sort_vector
 void test_pq_sort_vector(void) {
 	Vector vec = vector_create(0, free);
 
@@ -42,6 +43,7 @@ void test_pq_sort_vector(void) {
 	vector_destroy(vec);
 }
 
+//test pq_sort_list
 void test_pq_sort_list(void) {
 	List list = list_create(free);
 
