@@ -155,8 +155,8 @@ void life_save_to_rle(LifeState state, char* file) {
 		exit(-1);
 	}
 	// Εύρεση της αριστερότερης συντεταγμένης ζωντανού κελιού της δοσμένης κατάστασης
-	// (num θα έιναι ο αριθμός ζωντανών κελιών που είναι εκκρεμότητα να γραφθούν)
-	int leftmost = __INT_MAX__, num = 0;
+	// (pending θα έιναι ο αριθμός ζωντανών κελιών που είναι εκκρεμότητα να γραφθούν)
+	int leftmost = __INT_MAX__, pending = 0;
 	SetNode node, prevnode;
 	for (node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
 		if (((LifeCell*)set_node_value(state->set, node))->x < leftmost) {
@@ -175,7 +175,7 @@ void life_save_to_rle(LifeState state, char* file) {
 		else if (((LifeCell*)set_node_value(state->set, node))->x - leftmost) {
 			fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - leftmost);
 		}
-		num++;
+		pending++;
 	}
 	// Αν είναι γράψε στο αρχείο "!" και επίστρεψε
 	else {
@@ -188,8 +188,8 @@ void life_save_to_rle(LifeState state, char* file) {
 		// Αν αλλάζει γραμμή (συντεταγμένη y) από το προηγούμενο
 		if (((LifeCell*)set_node_value(state->set, node))->y - ((LifeCell*)set_node_value(state->set, prevnode))->y) {
 			// γράψε όσα ζωντανά κελιά ("o") εκκρεμούν στην γραμμή
-			if (num != 1) {
-				fprintf(stream, "%do", num);
+			if (pending != 1) {
+				fprintf(stream, "%do", pending);
 			}
 			else {
 				fprintf(stream, "o");
@@ -209,24 +209,24 @@ void life_save_to_rle(LifeState state, char* file) {
 				fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - leftmost);
 			}
 			// θέσε το πλήθος των ζωντανά κελιά που είναι εκκρεμότητα να γραφθούν σε 1
-			num = 1;
+			pending = 1;
 		}
 		// Αλλιώς αν είναι ακριβώς δίπλα
 		else if (((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x == 1) {
 			// πρόσθεσε ένα ζωντανό κελί που είναι εκκρεμότητα να γραφθεί
-			num++;
+			pending++;
 		}
 		// Αλλιώς
 		else {
 			// γράψε όσα ζωντανά κελιά εκκρεμούν
-			if (num != 1) {
-				fprintf(stream, "%do", num);
+			if (pending != 1) {
+				fprintf(stream, "%do", pending);
 			}
 			else {
 				fprintf(stream, "o");
 			}
 			// θέσε το πλήθος των ζωντανά κελιά που είναι εκκρεμότητα να γραφθούν σε 1
-			num = 1;
+			pending = 1;
 			// γράψε τα νεκρά κελιά ανάμεσα σε αυτό το ζωντανό κελί και το προηγούμενο
 			if (((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x - 1 != 1) {
 				fprintf(stream, "%db", ((LifeCell*)set_node_value(state->set, node))->x - ((LifeCell*)set_node_value(state->set, prevnode))->x - 1);
@@ -237,8 +237,8 @@ void life_save_to_rle(LifeState state, char* file) {
 		}
 	}
 	// γράψε όσα ζωντανά κελιά εκκρεμούν
-	if (num != 1) {
-		fprintf(stream, "%do", num);
+	if (pending != 1) {
+		fprintf(stream, "%do", pending);
 	}
 	else {
 		fprintf(stream, "o");
@@ -267,7 +267,7 @@ LifeState life_evolve(LifeState state) {
 	// κατάσταση που περιέχει τα σίγουρα νεκρά κελιά της εξελιγμένης κατάστασης
 	LifeState deadcells = life_create();
 	LifeCell cell, tmpcell;
-	int num, i, j, k, l;
+	int alive, i, j, k, l;
 	// για κάθε ζωντανό κελί της παλιάς κατάστασης
 	for (SetNode node = set_first(state->set) ; node != SET_EOF ; node = set_next(state->set, node)) {
 		// ελέγχεται αυτό και όλα τα γειτονικά του
@@ -279,7 +279,7 @@ LifeState life_evolve(LifeState state) {
 				// αν δεν έχει τεθεί ως ζωντανό ή νεκρό στην εξελιγμένη κατάσταση
 				if ((!life_get_cell(newstate, cell)) && (!life_get_cell(deadcells, cell))) {
 					// μετρώνται οι ζωνανοί γείτονες
-					num = 0;
+					alive = 0;
 					for (k = -1 ; k <= 1 ; k++) {
 						for (l = -1 ; l <= 1 ; l++) {
 							if ((k == 0) && (l == 0)) {
@@ -289,13 +289,13 @@ LifeState life_evolve(LifeState state) {
 							tmpcell.x += k;
 							tmpcell.y += l;
 							if (life_get_cell(state, tmpcell)) {
-								num++;
+								alive++;
 							}
 						}
 					}
 					// αν είναι 3 ή είναι 2 και το κελί είναι ζωντανό
 					// θα είναι ζωντανό στην εξελιγμένη κατάσταση
-					if ((num == 3) || ((num == 2) && life_get_cell(state, cell))) {
+					if ((alive == 3) || ((alive == 2) && life_get_cell(state, cell))) {
 						life_set_cell(newstate, cell, true);
 					}
 					// αλλιώς θα είναι νεκρό

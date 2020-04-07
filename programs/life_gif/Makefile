@@ -16,7 +16,7 @@ OBJS = life_gif.o $(MODULES)/life.o $(LIB)/k08.a $(LIB)/libbmp.a  #<-----------f
 EXEC = life_gif
 
 # Παράμετροι για δοκιμαστική εκτέλεση
-ARGS =
+ARGS = ../../tests/life_test/glider.rle 10 -10 -10 10 20 1 1 100 example.gif
 
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
