@@ -4,8 +4,6 @@
 #define LINELENGTH 200
 #define LINEAMOUNT 100000
 
-//use heap array later
-
 struct line {
     char* text;
     int times;
