@@ -224,8 +224,8 @@ TEST_LIST = {
 	{ "life_create_from_rle", test_create_from_rle },
     { "life_save_to_rle", test_save_to_rle },
     { "life_evolve", test_evolve },
-    { "life_evolve_many", test_evolve_many },
-    { "life_iteration", test_iteration },
+//    { "life_evolve_many", test_evolve_many },
+//    { "life_iteration", test_iteration },
 
 	{ NULL, NULL } // τερματίζουμε τη λίστα με NULL
 };
