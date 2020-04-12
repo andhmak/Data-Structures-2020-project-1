@@ -24,10 +24,10 @@ int main(int argc, char *argv[]) {
 	int zoom_out = round(1/zoom);
 	// πίνακας που θα αποθηκεύει το πλήθος των ζωντανών κελιών
 	// σε κάθε pixel για την περίπτωση που zoom < 1
-	uint live_cells[(right - left + 1)/zoom_out][(top - bottom + 1)/zoom_out];  //<----maybe malloc (calloc) so not used in zoom>=1 case (no significant difference time-wise in either case)
+	uint live_cells[(right - left + 1)/zoom_out][(top - bottom + 1)/zoom_out];
 	// αρχικοποίηση σε 0
 	if (zoom < 1) {
-		for (uint i = 0 ; i < (right - left + 1)/zoom_out ; i++) {             //<-----maybe put an if on that loop so it doesn't run when zoom >= 1
+		for (uint i = 0 ; i < (right - left + 1)/zoom_out ; i++) {
 			for (uint j = 0 ; j < (top - bottom + 1)/zoom_out ; j++) {
 				live_cells[i][j] = 0;
 			}
